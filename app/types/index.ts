@@ -466,13 +466,3 @@ export interface APIKey {
   createdAt: string;
   expiresAt?: string;
 }
-
-// AI Chat Types
-export interface AIChatMessage {
-  id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: string;
-}
-
-export type ExtendedUserRole = 'visitor' | 'customer' | 'affiliate' | 'distributor' | 'admin' | 'superadmin';

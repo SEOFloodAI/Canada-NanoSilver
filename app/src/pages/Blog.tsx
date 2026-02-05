@@ -1,14 +1,21 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
-  Search, Calendar, User, Tag, ArrowRight,
-  TrendingUp, BookOpen
+  Calendar, 
+  Clock, 
+  User, 
+  Tag, 
+  Search, 
+  ChevronRight,
+  Play,
+  Eye,
+  Share2,
+  Bookmark
 } from 'lucide-react';
-import { useAuthStore } from '@/store';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface BlogPost {
@@ -17,325 +24,443 @@ interface BlogPost {
   slug: string;
   excerpt: string;
   content: string;
-  author: string;
-  category: string;
+  featuredImage?: string;
+  videoUrl?: string;
   tags: string[];
-  status: 'draft' | 'published';
-  publishedAt?: string;
-  createdAt: string;
-  featured?: boolean;
+  authorName: string;
+  authorAvatar?: string;
+  publishedAt: string;
+  readTime: string;
+  viewCount: number;
+  category: string;
 }
 
 const blogPosts: BlogPost[] = [
   {
     id: '1',
-    title: 'Understanding Nano-Structured Silver Technology',
-    slug: 'understanding-nano-structured-silver',
-    excerpt: 'Explore the science behind nano-structured silver and how SIVERS™ leverages cutting-edge technology for wellness support.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
+    title: 'What Is SilverSol™ Technology?',
+    slug: 'what-is-silversol-technology',
+    excerpt: 'Discover the revolutionary nano-structured silver technology that is changing the wellness industry.',
+    content: 'Full article content...',
+    tags: ['SilverSol™', 'Technology', 'Education'],
+    authorName: 'SilverSol™ Team',
+    publishedAt: '2026-01-15',
+    readTime: '5 min read',
+    viewCount: 1250,
     category: 'Education',
-    tags: ['technology', 'science', 'nano-silver'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    featured: true,
   },
   {
     id: '2',
-    title: 'The History of Silver in Wellness',
-    slug: 'history-of-silver-wellness',
-    excerpt: 'From ancient civilizations to modern science - discover the journey of silver in supporting human wellness.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'History',
-    tags: ['history', 'silver', 'wellness'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'The Science Behind Nano-Silver (Explained Simply)',
+    slug: 'science-behind-nano-silver',
+    excerpt: 'A beginner-friendly explanation of how nano-silver works at the molecular level.',
+    content: 'Full article content...',
+    tags: ['Science', 'Education', 'Nano Silver'],
+    authorName: 'Dr. Research Team',
+    publishedAt: '2026-01-12',
+    readTime: '8 min read',
+    viewCount: 980,
+    category: 'Science',
   },
   {
     id: '3',
-    title: 'SIVERS™ vs Traditional Colloidal Silver: What is the Difference?',
-    slug: 'sivers-vs-colloidal-silver',
-    excerpt: 'Learn what sets SIVERS™ apart from traditional colloidal silver products.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'Comparison',
-    tags: ['comparison', 'colloidal', 'technology'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'How SilverSol™ Differs From Regular Colloidal Silver',
+    slug: 'silversol-vs-colloidal-silver',
+    excerpt: 'Understanding the key differences that make SilverSol™ the superior choice.',
+    content: 'Full article content...',
+    tags: ['Comparison', 'SilverSol™', 'Colloidal Silver'],
+    authorName: 'SilverSol™ Team',
+    publishedAt: '2026-01-10',
+    readTime: '6 min read',
+    viewCount: 1450,
+    category: 'Education',
   },
   {
     id: '4',
-    title: 'Research Insights: Nano-Structured Silver Studies',
-    slug: 'research-insights-nano-silver',
-    excerpt: 'A review of current research on nano-structured silver and its applications.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'Research',
-    tags: ['research', 'studies', 'science'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'Top 10 Benefits of Silver-Based Wellness Products',
+    slug: 'top-10-benefits-silver-wellness',
+    excerpt: 'Explore the many ways silver-based products can support your wellness journey.',
+    content: 'Full article content...',
+    tags: ['Benefits', 'Wellness', 'Top 10'],
+    authorName: 'Wellness Expert',
+    publishedAt: '2026-01-08',
+    readTime: '7 min read',
+    viewCount: 2100,
+    category: 'Wellness',
   },
   {
     id: '5',
-    title: 'Wellness Support: A Holistic Approach',
-    slug: 'wellness-support-holistic-approach',
-    excerpt: 'How SIVERS™ fits into a comprehensive wellness lifestyle.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'Wellness',
-    tags: ['wellness', 'lifestyle', 'holistic'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'The Safety Profile of SilverSol™',
+    slug: 'silversol-safety-profile',
+    excerpt: 'A comprehensive look at the safety research and data behind SilverSol™ products.',
+    content: 'Full article content...',
+    tags: ['Safety', 'Research', 'SilverSol™'],
+    authorName: 'Safety Team',
+    publishedAt: '2026-01-05',
+    readTime: '10 min read',
+    viewCount: 890,
+    category: 'Safety',
   },
   {
     id: '6',
-    title: 'Quality Assurance at Canada Nano Silver',
-    slug: 'quality-assurance-canada-nano-silver',
-    excerpt: 'Our commitment to quality, safety, and transparency in every bottle.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'Quality',
-    tags: ['quality', 'safety', 'transparency'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'How Affiliates Can Earn with SilverSol™',
+    slug: 'affiliates-earn-silversol',
+    excerpt: 'Learn about our affiliate program and how you can start earning commissions today.',
+    content: 'Full article content...',
+    videoUrl: 'https://example.com/video',
+    tags: ['Affiliate', 'Business', 'Earning'],
+    authorName: 'Marketing Team',
+    publishedAt: '2026-01-03',
+    readTime: '5 min read',
+    viewCount: 3200,
+    category: 'Business',
   },
   {
     id: '7',
-    title: 'Frequently Asked Questions About SIVERS™',
-    slug: 'faq-sivers',
-    excerpt: 'Get answers to the most common questions about SIVERS™ products.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'FAQ',
-    tags: ['faq', 'questions', 'answers'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'Distributor Success Tips',
+    slug: 'distributor-success-tips',
+    excerpt: 'Proven strategies for SilverSol™ distributors to grow their business.',
+    content: 'Full article content...',
+    tags: ['Distributor', 'Business', 'Success'],
+    authorName: 'Sales Team',
+    publishedAt: '2026-01-01',
+    readTime: '8 min read',
+    viewCount: 1100,
+    category: 'Business',
   },
   {
     id: '8',
-    title: 'The Future of Nano-Technology in Wellness',
-    slug: 'future-nano-technology-wellness',
-    excerpt: 'What is next for nano-structured silver and wellness technology?',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'Innovation',
-    tags: ['future', 'innovation', 'technology'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'Why Nano-Structured Silver Is the Future',
+    slug: 'nano-silver-future',
+    excerpt: 'Exploring the cutting-edge research and future applications of nano-silver technology.',
+    content: 'Full article content...',
+    tags: ['Future', 'Technology', 'Innovation'],
+    authorName: 'Research Team',
+    publishedAt: '2025-12-28',
+    readTime: '6 min read',
+    viewCount: 1650,
+    category: 'Science',
   },
   {
     id: '9',
-    title: 'Customer Success Stories: Wellness Journeys',
-    slug: 'customer-success-stories',
-    excerpt: 'Real stories from real people who have incorporated SIVERS™ into their wellness routines.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'Stories',
-    tags: ['stories', 'testimonials', 'wellness'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'Everyday Uses for SilverSol™ Products',
+    slug: 'everyday-uses-silversol',
+    excerpt: 'Practical ways to incorporate SilverSol™ into your daily wellness routine.',
+    content: 'Full article content...',
+    tags: ['Usage', 'Wellness', 'Daily Routine'],
+    authorName: 'Lifestyle Team',
+    publishedAt: '2025-12-25',
+    readTime: '5 min read',
+    viewCount: 2300,
+    category: 'Wellness',
   },
   {
     id: '10',
-    title: 'How to Choose the Right SIVERS™ Product',
-    slug: 'choose-right-sivers-product',
-    excerpt: 'A guide to selecting the best SIVERS™ product for your wellness needs.',
-    content: 'Full article content here...',
-    author: 'Canada Nano Silver Team',
-    category: 'Guide',
-    tags: ['guide', 'products', 'selection'],
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    title: 'Research Trends in Nano Silver',
+    slug: 'research-trends-nano-silver',
+    excerpt: 'The latest discoveries and trends in nano silver research from around the world.',
+    content: 'Full article content...',
+    tags: ['Research', 'Trends', 'Science'],
+    authorName: 'Research Team',
+    publishedAt: '2025-12-20',
+    readTime: '9 min read',
+    viewCount: 780,
+    category: 'Science',
   },
 ];
 
+const categories = ['All', 'Education', 'Science', 'Wellness', 'Safety', 'Business'];
+
 export function Blog() {
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
-
-  const categories = ['all', ...Array.from(new Set(blogPosts.map(p => p.category)))];
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   const filteredPosts = blogPosts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
-    return matchesSearch && matchesCategory && post.status === 'published';
+    const matchesSearch = 
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  const featuredPost = filteredPosts.find(p => p.featured) || filteredPosts[0];
-  const recentPosts = filteredPosts.filter(p => p.id !== featuredPost?.id).slice(0, 3);
-  const otherPosts = filteredPosts.filter(p => p.id !== featuredPost?.id).slice(3);
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <Badge className="mb-4">Canada Nano Silver Insights</Badge>
-        <h1 className="text-4xl font-bold mb-4 font-orbitron">The Blog</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Stay informed with the latest news, research insights, and wellness tips 
-          about nano-structured silver technology and the Canada Nano Silver community.
-        </p>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search articles..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-background/50 border-primary/30"
-          />
+    <div className="min-h-screen bg-background pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 mb-6">
+            <Calendar className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-primary">Latest Updates</span>
+          </div>
+          <h1 className="font-orbitron text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+            SilverSol™ <span className="text-primary">Blog</span>
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Stay informed with the latest news, research, and insights about SilverSol™ technology 
+            and nano silver wellness products.
+          </p>
         </div>
-        {isAdmin && (
-          <Button onClick={() => navigate('/blog/new')} className="btn-holographic">
-            Write New Post
-          </Button>
-        )}
-      </div>
 
-      {/* Category Tabs */}
-      <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-8">
-        <TabsList className="flex flex-wrap bg-background/50">
-          {categories.map(cat => (
-            <TabsTrigger key={cat} value={cat} className="capitalize">
-              {cat}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+        {/* Search */}
+        <div className="max-w-xl mx-auto mb-8">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 input-holographic"
+            />
+          </div>
+        </div>
 
-      {/* Featured Post */}
-      {featuredPost && (
-        <Card className="mb-8 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer holographic-card"
-          onClick={() => navigate(`/blog/${featuredPost.slug}`)}>
-          <div className="grid lg:grid-cols-2">
-            <div className="aspect-video lg:aspect-auto bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-              <BookOpen className="h-24 w-24 text-primary/50" />
-            </div>
-            <CardContent className="p-8 flex flex-col justify-center">
-              <div className="flex items-center space-x-2 mb-3">
-                <Badge>{featuredPost.category}</Badge>
-                <span className="text-sm text-muted-foreground flex items-center">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  Featured
-                </span>
+        {/* Category Tabs */}
+        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-8">
+          <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent justify-center">
+            {categories.map((category) => (
+              <TabsTrigger
+                key={category}
+                value={category}
+                className={cn(
+                  'px-4 py-2 rounded-full border transition-all',
+                  selectedCategory === category
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-transparent border-primary/30 text-muted-foreground hover:border-primary/60'
+                )}
+              >
+                {category}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+
+        {/* Featured Post */}
+        {!searchQuery && selectedCategory === 'All' && !selectedPost && (
+          <Card className="holographic-card mb-12 overflow-hidden">
+            <div className="grid md:grid-cols-2">
+              <div className="aspect-video md:aspect-auto bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                <Play className="w-16 h-16 text-primary/50" />
               </div>
-              <h2 className="text-2xl font-bold mb-3 font-orbitron">{featuredPost.title}</h2>
-              <p className="text-muted-foreground mb-4">{featuredPost.excerpt}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <span className="flex items-center">
-                    <User className="h-4 w-4 mr-1" />
-                    {featuredPost.author}
+              <div className="p-8">
+                <Badge className="mb-4">Featured</Badge>
+                <h2 className="font-orbitron text-2xl font-semibold mb-3">
+                  What Is SilverSol™ Technology?
+                </h2>
+                <p className="text-muted-foreground mb-4">
+                  Discover the revolutionary nano-structured silver technology that is changing 
+                  the wellness industry. Learn about the science, benefits, and what makes 
+                  SilverSol™ different from traditional colloidal silver.
+                </p>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    January 15, 2026
                   </span>
-                  <span className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    {new Date(featuredPost.publishedAt || featuredPost.createdAt).toLocaleDateString()}
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    5 min read
                   </span>
                 </div>
-                <Button variant="ghost">
-                  Read More
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                <Button className="btn-holographic">
+                  Read Article
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
-            </CardContent>
-          </div>
-        </Card>
-      )}
+            </div>
+          </Card>
+        )}
 
-      {/* Recent Posts Grid */}
-      {recentPosts.length > 0 && (
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {recentPosts.map((post) => (
-            <Card key={post.id} className="hover:shadow-lg transition-shadow cursor-pointer holographic-card"
-              onClick={() => navigate(`/blog/${post.slug}`)}>
-              <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                <BookOpen className="h-12 w-12 text-primary/50" />
+        {/* Posts Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPosts.map((post) => (
+            <Card 
+              key={post.id} 
+              className="holographic-card group cursor-pointer hover:scale-[1.02] transition-all"
+              onClick={() => setSelectedPost(post)}
+            >
+              <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center relative overflow-hidden">
+                {post.videoUrl ? (
+                  <>
+                    <Play className="w-12 h-12 text-primary/50" />
+                    <div className="absolute top-3 left-3">
+                      <Badge className="bg-red-500/80">Video</Badge>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                      <span className="font-orbitron text-2xl text-primary">
+                        {post.title.charAt(0)}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
-              <CardContent className="p-4">
-                <Badge variant="secondary" className="mb-2">{post.category}</Badge>
-                <h3 className="font-semibold mb-2 line-clamp-2 font-orbitron">{post.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{post.excerpt}</p>
-                <div className="flex items-center text-xs text-muted-foreground">
-                  <Calendar className="h-3 w-3 mr-1" />
-                  {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className="text-xs">
+                    {post.category}
+                  </Badge>
+                </div>
+                <h3 className="font-orbitron font-semibold text-lg group-hover:text-primary transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                  {post.excerpt}
+                </p>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {formatDate(post.publishedAt)}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {post.readTime}
+                    </span>
+                  </div>
+                  <span className="flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    {post.viewCount.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-3">
+                  {post.tags.slice(0, 3).map((tag) => (
+                    <span 
+                      key={tag} 
+                      className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
-      )}
 
-      {/* More Posts */}
-      {otherPosts.length > 0 && (
-        <div>
-          <h2 className="text-xl font-bold mb-4 font-orbitron">More Articles</h2>
-          <div className="space-y-4">
-            {otherPosts.map((post) => (
-              <Card key={post.id} className="hover:shadow-md transition-shadow cursor-pointer holographic-card"
-                onClick={() => navigate(`/blog/${post.slug}`)}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge variant="outline">{post.category}</Badge>
-                        <span className="text-xs text-muted-foreground flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <h3 className="font-semibold mb-1 font-orbitron">{post.title}</h3>
-                      <p className="text-sm text-muted-foreground">{post.excerpt}</p>
-                      <div className="flex items-center space-x-2 mt-2">
-                        {post.tags.slice(0, 3).map(tag => (
-                          <span key={tag} className="text-xs text-muted-foreground flex items-center">
-                            <Tag className="h-3 w-3 mr-1" />
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <ArrowRight className="h-5 w-5 text-muted-foreground ml-4" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+        {/* No Results */}
+        {filteredPosts.length === 0 && (
+          <div className="text-center py-20">
+            <Search className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+            <h3 className="font-orbitron text-xl font-semibold mb-2">
+              No articles found
+            </h3>
+            <p className="text-muted-foreground">
+              Try adjusting your search or filter criteria
+            </p>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Newsletter CTA */}
-      <div className="mt-16 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl p-8 text-center border border-primary/20">
-        <h2 className="text-2xl font-bold mb-4 font-orbitron">Stay Updated</h2>
-        <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-          Subscribe to our newsletter for the latest articles, research updates, 
-          and exclusive Canada Nano Silver insights delivered to your inbox.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-          <Input 
-            placeholder="Enter your email" 
-            className="bg-background/50 border-primary/30"
-          />
-          <Button className="btn-holographic">Subscribe</Button>
-        </div>
+        {/* Post Detail Modal */}
+        {selectedPost && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto"
+            onClick={() => setSelectedPost(null)}
+          >
+            <Card 
+              className="holographic-card max-w-3xl w-full my-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+                {selectedPost.videoUrl ? (
+                  <div className="text-center">
+                    <Play className="w-20 h-20 text-primary/50 mx-auto mb-2" />
+                    <p className="text-muted-foreground">Video player coming soon</p>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                      <span className="font-orbitron text-4xl text-primary">
+                        {selectedPost.title.charAt(0)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="p-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <Badge>{selectedPost.category}</Badge>
+                  {selectedPost.videoUrl && (
+                    <Badge className="bg-red-500/80">Video</Badge>
+                  )}
+                </div>
+                <h2 className="font-orbitron text-2xl sm:text-3xl font-bold mb-4">
+                  {selectedPost.title}
+                </h2>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+                  <span className="flex items-center gap-1">
+                    <User className="w-4 h-4" />
+                    {selectedPost.authorName}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {formatDate(selectedPost.publishedAt)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {selectedPost.readTime}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    {selectedPost.viewCount.toLocaleString()} views
+                  </span>
+                </div>
+                <div className="prose prose-invert max-w-none mb-6">
+                  <p className="text-lg text-muted-foreground">{selectedPost.excerpt}</p>
+                  <p className="text-muted-foreground">
+                    Full article content would be displayed here. This is a placeholder 
+                    for the complete blog post content including rich text, images, and 
+                    any embedded media.
+                  </p>
+                  <p className="text-muted-foreground">
+                    SilverSol™ technology represents a significant advancement in nano silver 
+                    formulations. Unlike traditional colloidal silver, SilverSol™ uses a patented 
+                    metallic silver particle with a unique oxide coating that enhances stability, 
+                    bio-compatibility, and effectiveness.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {selectedPost.tags.map((tag) => (
+                    <span 
+                      key={tag}
+                      className="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm"
+                    >
+                      <Tag className="w-3 h-3" />
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-3">
+                  <Button className="flex-1 btn-holographic">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share Article
+                  </Button>
+                  <Button variant="outline">
+                    <Bookmark className="w-4 h-4 mr-2" />
+                    Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setSelectedPost(null)}>
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

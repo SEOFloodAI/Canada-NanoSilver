@@ -93,7 +93,7 @@ export function DistributorApply() {
             </div>
             <h2 className="font-orbitron text-2xl font-bold mb-4">Application Submitted!</h2>
             <p className="text-muted-foreground mb-6">
-              Thank you for your interest in becoming a Canada Nano Silver distributor of our Silversol Technology products. 
+              Thank you for your interest in becoming a SilverSol™ distributor. 
               Our team will review your application and contact you within 2-3 business days.
             </p>
             
@@ -101,7 +101,7 @@ export function DistributorApply() {
             <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mb-6 text-left">
               <h3 className="font-orbitron font-semibold text-lg mb-3 flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-primary" />
-                Welcome to the Canada Nano Silver Distributor Network!
+                Welcome to the SilverSol™ Distributor Network!
               </h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 You now have access to wholesale pricing, distributor tools, product education, 
@@ -138,7 +138,7 @@ export function DistributorApply() {
               <span className="text-sm font-medium text-primary">Distributor Program</span>
             </div>
             <h1 className="font-orbitron text-3xl sm:text-4xl font-bold mb-4">
-              Become a Canada Nano Silver Distributor of our <span className="text-primary">Silversol Technology</span> products
+              Become a <span className="text-primary">SilverSol™</span> Distributor
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Join our network of authorized distributors and offer your customers 
@@ -357,7 +357,7 @@ export function DistributorApply() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Why are you interested in Canada Nano Silver? *</label>
+                  <label className="text-sm font-medium mb-2 block">Why are you interested in SilverSol™? *</label>
                   <Textarea
                     required
                     value={formData.whyInterested}
@@ -404,7 +404,7 @@ export function DistributorApply() {
               <Alert className="bg-amber-950/30 border-amber-500/30">
                 <AlertDescription className="text-amber-200/90 text-sm">
                   By submitting this application, you agree that all information provided is accurate 
-                  and you authorize Canada Nano Silver to verify your business credentials. Approved distributors 
+                  and you authorize SilverSol™ to verify your business credentials. Approved distributors 
                   will receive access to our wholesale portal, marketing materials, and distributor forum.
                 </AlertDescription>
               </Alert>

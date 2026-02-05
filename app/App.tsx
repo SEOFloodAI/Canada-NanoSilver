@@ -11,8 +11,6 @@ import { Cart } from '@/pages/Cart';
 import { Login } from '@/pages/Login';
 import { DistributorApply } from '@/pages/DistributorApply';
 import { AffiliateApply } from '@/pages/AffiliateApply';
-import { LearningCenter } from '@/pages/LearningCenter';
-import { Blog } from '@/pages/Blog';
 import { useAuthStore, useProductStore } from '@/store';
 
 // Home Page - Revolutionary Nano Silver Store
@@ -468,8 +466,6 @@ function App() {
                     <Route path="/wellness" element={<WellnessPage />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/cart" element={<Cart />} />
-                    <Route path="/learning" element={<LearningCenter />} />
-                    <Route path="/blog" element={<Blog />} />
                     <Route
                       path="/admin"
                       element={
